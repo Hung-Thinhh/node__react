@@ -4,8 +4,13 @@ const handleHome = (req,res) => {
 const handleCreateUser = (req,res) => {
     return res.render('user.ejs')
 }
+const handleCreateNewUser = (req, res) => { 
+    console.log('check',req)
+    return res.send('handleCreateNewUser')
+}
 
 module.exports = {
     handleHome,
-    handleCreateUser
+    handleCreateUser,
+    handleCreateNewUser
 }

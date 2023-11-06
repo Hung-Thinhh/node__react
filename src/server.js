@@ -8,7 +8,7 @@ configViewEngine(app);
 // init web router
 initWebRouter(app); 
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8888;
 console.log("PORT: " + PORT);
 app.listen(PORT, () => {
     console.log(" Running on port " + PORT +":  http://localhost:" +PORT);
