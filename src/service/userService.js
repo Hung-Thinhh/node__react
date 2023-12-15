@@ -24,74 +24,55 @@ const CreateNewUser = async (username, password, email) => {
   }
 };
 const EditUser = async (username, email, id) => {
-  // create the connection, specify bluebird as Promise
-  const connection = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "node_react",
-    Promise: bluebird,
-  });
-  // query database
+  
   try {
-    const [rows, fields] = await connection.execute(
-      "UPDATE users SET username = ?, email = ? WHERE id = ?",
-      [username, email, id]
-    );
-    return rows;
+    await db.User.update(
+      {
+        email: email,
+        username: username,
+      },
+      {
+      where: {
+        id: id,
+      }
+    })
   } catch (error) {
     console.log("---- Error: " + error);
   }
 };
 const GetUser = async () => {
-  // create the connection, specify bluebird as Promise
-  const connection = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "node_react",
-    Promise: bluebird,
-  });
-  // query database
+  
   try {
-    const [rows, fields] = await connection.execute("SELECT * FROM users");
-    return rows;
+    let users = [];
+    users = await db.User.findAll()
+    return users
   } catch (error) {
     console.log("---- Error: " + error);
   }
 };
 const GetUserbyID = async (id) => {
-  // create the connection, specify bluebird as Promise
-  const connection = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "node_react",
-    Promise: bluebird,
-  });
-  // query database
+  
   try {
-    const [rows, fields] = await connection.execute(
-      "SELECT * FROM users WHERE id = ?",
-      [id]
-    );
-    return rows;
+    let user = {}
+    user = await db.User.findOne({
+      where: {
+        id: id
+      }
+    })
+    return user.get({plain:true})
   } catch (error) {
     console.log("---- Error: " + error);
   }
 };
 const DelUser = async (id) => {
-  // create the connection, specify bluebird as Promise
-  const connection = await mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    database: "node_react",
-    Promise: bluebird,
-  });
-  // query database
+ 
   try {
-    const [rows, fields] = await connection.execute(
-      "DELETE FROM users WHERE id = ?",
-      [id]
-    );
-    return rows;
+    await db.User.destroy({
+      where: {
+        id: id,
+      }
+    })
+    
   } catch (error) {
     console.log("---- Error: " + error);
   }

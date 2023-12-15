@@ -6,13 +6,11 @@ const handleHome = (req, res) => {
 const handleEdit = async (req, res) => {
     let userID ={}
     const user = await userService.GetUserbyID(req.params.id)
-    if (user && user.length > 0) {
-        console.log(user)
-        userID = user[0]
+   
+        console.log(req.params.id)
+        userID = user
         return res.render('edit.ejs',{userID: userID})
-    } else {
-        return res.send('Không tìm thấy user')
-    }
+    
 }
 const handleCreateUser = async(req, res) => {
     let userList = await userService.GetUser()
