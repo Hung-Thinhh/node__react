@@ -1,6 +1,7 @@
 import express from "express";
 import configViewEngine from "./config/viewEngine";
 import initWebRouter from "./routes/web";
+import connection from "./config/connectDB";
 
 require("dotenv").config();
 
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }))
 // config view engine
 configViewEngine(app);
 
+connection()
 // init web router
 initWebRouter(app); 
 
