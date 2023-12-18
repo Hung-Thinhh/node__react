@@ -1,8 +1,6 @@
 import bcrypt from "bcryptjs";
-import mysql from "mysql2/promise";
 import db from '../models/index';
 // get the promise implementation, we will use bluebird
-const bluebird = require("bluebird");
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0//", salt);
 
