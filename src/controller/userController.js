@@ -2,12 +2,22 @@ import UserApiService from '../service/userApiService';
 
 const readFunc = async(req, res) => {
     try {
-        let data = await UserApiService.getAllUsers()
+        if (req.query.page && req.query.limit) {
+            console.log("page", req.query.page,"limit", req.query.limit);
+            let data = await UserApiService.getUsersbyPagination(req.query.page, req.query.limit);
         return res.status(200).json({
             EM: data.EM,
             EC: data.EC,
             DT: data.DT
         })
+        } else {
+            let data = await UserApiService.getAllUsers()
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT
+        })
+        }
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -43,7 +53,13 @@ const updateFunc = async(req, res) => {
 }
 const deleteFunc = async(req, res) => {
     try {
-      
+        console.log(req.body.id)
+        const data = await UserApiService.deleteUsers(req.body.id);
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({
