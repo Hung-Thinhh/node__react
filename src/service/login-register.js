@@ -36,7 +36,7 @@ const handleRegister = async (data) => {
         EC: "1",
       };
     }
-    let isPhoneExist = await checkPhone(data.email);
+    let isPhoneExist = await checkPhone(data.phone);
     if (isPhoneExist) {
       return {
         EM: "the phone number already exists",
@@ -102,4 +102,6 @@ const handleLogin = async (data) => {
 module.exports = {
   handleRegister,
   handleLogin,
+  checkEmail,
+  checkPhone
 };

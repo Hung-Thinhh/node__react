@@ -29,7 +29,12 @@ const readFunc = async(req, res) => {
 }
 const createFunc = async(req, res) => {
     try {
-  
+        let data = await UserApiService.createUsers(req.body);
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({
@@ -41,7 +46,12 @@ const createFunc = async(req, res) => {
 }
 const updateFunc = async(req, res) => {
     try {
-       
+        let data = await UserApiService.updateUsers(req.body);
+        return res.status(200).json({
+            EM: data.EM,
+            EC: data.EC,
+            DT: data.DT
+        })
     } catch (error) {
         console.log(error)
         return res.status(500).json({

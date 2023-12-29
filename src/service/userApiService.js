@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import db from "../models/index";
+import {checkEmail,checkPhone} from "./login-register";
 // get the promise implementation, we will use bluebird
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0//", salt);
@@ -43,8 +44,9 @@ const getUsersbyPagination = async (page, limit) => {
     const { count, rows } = await db.User.findAndCountAll({
       offset: +offset,
         limit: +limit,
-        attributes: ["id", "username", "email", "phone", "sex"],
-        include: { model: db.Group, attributes: ["name", "description"] },
+        attributes: ["id", "username", "email", "phone", "sex","address"],
+      include: { model: db.Group, attributes: ["name", "description","id"] },
+        order:[['id','DESC']]
     });
     let totalPages = Math.ceil(count / limit);
     let data = {
@@ -69,25 +71,34 @@ const getUsersbyPagination = async (page, limit) => {
     console.log("---- Error: " + error);
   }
 };
-const createUsers = async () => {
+const createUsers = async (data) => {
   try {
-    let user = await db.users.findAll({
-      attributes: ["id", "username", "email", "phone", "sex"],
-      include: { model: db.Group, attributes: ["name", "description"] },
-    });
-    if (user) {
+    let isEmailExist = await checkEmail(data.email);
+    if (isEmailExist) {
       return {
-        EM: "get data sussess",
-        EC: "0",
-        DT: user,
+        EM: "the Email already exists",
+        EC: "1",
+        DT: 'email'
       };
-    } else {
+    }
+    let isPhoneExist = await checkPhone(data.phone);
+    if (isPhoneExist) {
       return {
-        EM: "get data sussess",
+        EM: "the phone number already exists",
+        EC: "1",
+        DT:'phone'
+      };
+    }
+
+    let hashPass = hashPassword(data.password);
+      await db.User.create({...data,password: hashPass})
+  
+      return {
+        EM: "create ok",
         EC: "0",
         DT: [],
       };
-    }
+    
   } catch (error) {
     console.log("---- Error: " + error);
     return {
@@ -97,21 +108,34 @@ const createUsers = async () => {
     };
   }
 };
-const updateUsers = async () => {
+const updateUsers = async (data) => {
   try {
-    let user = await db.users.findAll({
-      attributes: ["id", "username", "email", "phone", "sex"],
-      include: { model: db.Group, attributes: ["name", "description"] },
-    });
-    if (user) {
+    if (!data.groupId) {
       return {
-        EM: "get data sussess",
+        EM: "Error with empty group",
+        EC: "1",
+        DT: 'groupId',
+      };
+    }
+    let user = await db.User.findOne({
+      where:{id:data.id}
+    })
+    
+    if (user) {
+      user.save({
+        username: data.username,
+        address: data.address,
+        sex: data.sex,
+        groupId: data.groupId
+      })
+      return {
+        EM: "Update data sussess",
         EC: "0",
-        DT: user,
+        DT: '',
       };
     } else {
       return {
-        EM: "get data sussess",
+        EM: "Error data update",
         EC: "0",
         DT: [],
       };
