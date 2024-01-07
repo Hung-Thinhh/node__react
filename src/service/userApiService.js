@@ -122,7 +122,7 @@ const updateUsers = async (data) => {
     })
     
     if (user) {
-      user.save({
+      await user.update({
         username: data.username,
         address: data.address,
         sex: data.sex,

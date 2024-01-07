@@ -1,6 +1,9 @@
+require('dotenv').config();
 import bcrypt from "bcryptjs";
 import db from "../models/index";
 import { Op } from "sequelize";
+import { getGroupWithRole } from "./jwt-services";
+import {createToken} from "../middleware/jwt";
 // get the promise implementation, we will use bluebird
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0//", salt);
@@ -50,6 +53,7 @@ const handleRegister = async (data) => {
       phone: data.phone,
       username: data.username,
       password: hashPass,
+      groupId:'4'
     });
     return {
       EM: "A user created successfully",
@@ -74,18 +78,28 @@ const handleLogin = async (data) => {
       },
     });
       if (user) {
-        console.log("check user")
       let isCorrectPassword = await checkPassword(data.password, user.password);
           if (isCorrectPassword) {
-          console.log("login is successfully")
+            
+            let groupWithRole = await getGroupWithRole(user);
+            let payload = {
+              email: user.email,
+              groupWithRole,
+              expiresIn: process.env.JWT_EXPIRES_IN
+            }
+            let token = createToken(payload);
         return {
           EM: "ok!",
           EC: "0",
+          DT: {
+            access_token: token,
+            data: groupWithRole,
+
+          }
         };
       }
     }
 
-    console.log("Account is incorrect", data.valueLogin, data.password);
     return {
       EM: "Your email/phone or password is incorrect!",
       EC: "1",

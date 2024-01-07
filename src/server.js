@@ -1,9 +1,9 @@
 import express from "express";
+import cookieParser from 'cookie-parser'
 import configViewEngine from "./config/viewEngine";
 import initWebRouter from "./routes/web";
 import initApiRouter from "./routes/api";
 import connection from "./config/connectDB";
-
 require("dotenv").config();
 
 
@@ -12,6 +12,8 @@ const app = express();
 
 // parse application/json
 app.use(express.json())
+// cookie parser
+app.use(cookieParser())
 
 app.use(function (req, res, next) {
 
@@ -37,6 +39,8 @@ app.use(express.urlencoded({ extended: true }))
 configViewEngine(app);
 
 connection()
+
+
 // init web router
 initWebRouter(app); 
 initApiRouter(app); 
