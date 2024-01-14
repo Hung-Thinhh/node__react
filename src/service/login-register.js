@@ -1,9 +1,9 @@
-require('dotenv').config();
+require("dotenv").config();
 import bcrypt from "bcryptjs";
 import db from "../models/index";
 import { Op } from "sequelize";
 import { getGroupWithRole } from "./jwt-services";
-import {createToken} from "../middleware/jwt";
+import { createToken } from "../middleware/jwt";
 // get the promise implementation, we will use bluebird
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0//", salt);
@@ -53,7 +53,7 @@ const handleRegister = async (data) => {
       phone: data.phone,
       username: data.username,
       password: hashPass,
-      groupId:'4'
+      groupId: "4",
     });
     return {
       EM: "A user created successfully",
@@ -77,38 +77,49 @@ const handleLogin = async (data) => {
         [Op.or]: [{ email: data.valueLogin }, { phone: data.valueLogin }],
       },
     });
-      if (user) {
+    if (user) {
+      console.log("hahah");
       let isCorrectPassword = await checkPassword(data.password, user.password);
-          if (isCorrectPassword) {
-            
-            let groupWithRole = await getGroupWithRole(user);
-            let payload = {
-              email: user.email,
-              groupWithRole,
-              expiresIn: process.env.JWT_EXPIRES_IN
-            }
-            let token = createToken(payload);
+      if (isCorrectPassword) {
+        let groupWithRole = await getGroupWithRole(user);
+        let payload = {
+          email: user.email,
+          groupWithRole,
+          email: user.email,
+          name: user.username
+        };
+        let token = createToken(payload);
         return {
           EM: "ok!",
           EC: "0",
           DT: {
             access_token: token,
             data: groupWithRole,
-
-          }
+            email: user.email,
+            name: user.username
+          },
         };
       }
+    } else {
+      console.log("hahah");
+      return {
+        EM: "Your email/phone or password is incorrect!",
+        EC: "2",
+        DT: "",
+      };
     }
 
     return {
       EM: "Your email/phone or password is incorrect!",
       EC: "1",
+      DT: "",
     };
   } catch (error) {
     console.log("error: >>>>", error);
     return {
       EM: "error creating user",
       EC: "2",
+      DT: "",
     };
   }
 };
@@ -117,5 +128,5 @@ module.exports = {
   handleRegister,
   handleLogin,
   checkEmail,
-  checkPhone
+  checkPhone,
 };

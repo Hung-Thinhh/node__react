@@ -36,14 +36,21 @@ const handleLogin = async(req, res) => {
                 DT: ''
             })
         }
+        console.log(req.body.valueLogin)
         let data = await loginRegister.handleLogin(req.body)
-        res.cookie('jwt',data.DT.access_token,{httpOnly:true , maxAge: 60*60*1000})
-        return res.status(200).json({
-            EM: data.EM,
-            EC: data.EC,
-            DT: data.DT
-        })
+        if (data) {
+            console.log(data)
+            res.cookie('jwt', data.DT.access_token, { httpOnly: true, maxAge: 60 * 60 * 1000 })
+            return res.status(200).json({
+                EM: data.EM,
+                EC: data.EC,
+                DT: data.DT
+            })
+        }
+        
     } catch (error) {
+    console.log("error: >>>>", error);
+
         return res.status(500).json({
             EM: 'error from server',
             EC: '-1',

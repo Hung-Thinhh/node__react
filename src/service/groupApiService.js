@@ -6,7 +6,6 @@ const getAllGroup = async() => {
             ['name','ASC']
         ]
     });
-      console.log(group);
       if (group) {
         return {
           EM: "get data group sussess",
