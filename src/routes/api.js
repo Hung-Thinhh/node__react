@@ -13,6 +13,7 @@ router.all('*',checkUserJWT,checkUserPermission)
 
     router.post("/register", apiController.handleRegister);
     router.post("/login", apiController.handleLogin);
+    router.post("/logout", apiController.handleLogout);
 
     // CRUD
     router.get("/account",userController.accountUser)

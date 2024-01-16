@@ -79,6 +79,7 @@ const deleteFunc = async(req, res) => {
     }
 }
 const accountUser = (req, res) => { 
+    console.log(req.user)
     return res.status(200).json({
         EM: "ok!",
           EC: "0",
@@ -86,7 +87,7 @@ const accountUser = (req, res) => {
             access_token: req.token,
             groupWithRole:req.user.groupWithRole,
             email: req.user.email,
-            username: req.user.username
+            username: req.user.name
           },
     })
 }

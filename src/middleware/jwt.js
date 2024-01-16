@@ -23,7 +23,7 @@ const verifyToken = (token) => {
   return decode;
 };
 
-const nonSecurePaths = ["/", "/register", "/login"];
+const nonSecurePaths = ["/", "/register", "/login",'/logout'];
 
 const extractToken = (req) => { 
   console.log(req.headers.authorization.split(' ')[0])
@@ -64,11 +64,14 @@ const checkUserPermission = (req, res, next) => {
     return next();
 
   if (req.user) {
+    console.log(req.user)
     let email = req.user.email;
     let roles = req.user.groupWithRole.Roles;
     let currUrl = req.path;
-    console.log(currUrl);
+    console.log(roles);
     if (!roles || roles.length === 0) {
+    console.log('hahah');
+
       return res.status(403).json({
         EC: "-1",
         DT: "",
