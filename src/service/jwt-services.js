@@ -1,6 +1,6 @@
 import db from '../models/index';
 
-const getGroupWithRole = async(user) => {
+const getGroupWithRole = async (user) => {
     let roles = await db.Group.findOne({
         where: { id: user.groupId },
         attributes : ['id','name','description'],

@@ -26,7 +26,6 @@ const verifyToken = (token) => {
 const nonSecurePaths = ["/", "/register", "/login",'/logout'];
 
 const extractToken = (req) => { 
-  console.log(req.headers.authorization.split(' ')[0])
   if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
     return req.headers.authorization.split(' ')[1]
   }
@@ -64,13 +63,10 @@ const checkUserPermission = (req, res, next) => {
     return next();
 
   if (req.user) {
-    console.log(req.user)
     let email = req.user.email;
     let roles = req.user.groupWithRole.Roles;
     let currUrl = req.path;
-    console.log(roles);
     if (!roles || roles.length === 0) {
-    console.log('hahah');
 
       return res.status(403).json({
         EC: "-1",
@@ -78,7 +74,7 @@ const checkUserPermission = (req, res, next) => {
         EM: `You don't have permission to access this resource...`,
       });
     }
-    let canAccess = roles.some((item) => item.url === currUrl);
+    let canAccess = roles.some((item) => item.url === currUrl || currUrl.includes(item.url));
     if (canAccess) {
       next();
     } else {
