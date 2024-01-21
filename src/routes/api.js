@@ -28,7 +28,9 @@ router.all('*',checkUserJWT,checkUserPermission)
     router.post("/role/create",roleController.createFunc)
     router.put("/role/update",roleController.updateFunc)
     router.delete("/role/delete", roleController.deleteFunc)
-    router.get("/role/by-group/:id",roleController.readRolebyGroup)
+    router.get("/role/by-group/:id", roleController.readRolebyGroup)
+    router.post("/role/assign-to-group",roleController.assignRoleToGroup)
+    
 
     //group router
     router.get("/group/read",groupController.readFunc)

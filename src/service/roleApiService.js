@@ -109,9 +109,37 @@ const deleteRoles = async (id) => {
     };
   }
 };
+const assignRoleToGroup = async (data) => {
+  try {
+    if (data) {
+      await db.Group_Role.destroy({
+        where: {groupId: data.groupId}
+      })
+       await db.Group_Role.bulkCreate(data.groupRoles)
+      return {
+        EM: "Assign roles to group successfully",
+        EC: "0",
+        DT: data,
+      };
+    } else {
+      return {
+        EM: "Assign roles to group successfully",
+        EC: "0",
+        DT: [],
+      };
+    }
+  } catch (error) {
+    return {
+      EM: "something wrongs with servies",
+      EC: "1",
+      DT: "",
+    };
+  }
+};
 module.exports = {
   createNewRoles,
   getAllRoles,
   deleteRoles,
   getRolebyGroup,
+  assignRoleToGroup
 };
