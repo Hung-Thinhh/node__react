@@ -18,6 +18,9 @@ router.all('*',checkUserJWT,checkUserPermission)
 
     // CRUD
     router.get("/account",userController.accountUser)
+    router.get("/profile",userController.profileUser)
+    router.post("/editprofile",userController.editprofileUser)
+    router.post("/changepass",userController.changePassUser)
 //user router
     router.get("/user/read",userController.readFunc)
     router.post("/user/create",userController.createFunc)

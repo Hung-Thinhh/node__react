@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import db from "../models/index";
-import {checkEmail,checkPhone} from "./login-register";
+import { checkUsername, checkPassword } from "./login-register";
 // get the promise implementation, we will use bluebird
 var salt = bcrypt.genSaltSync(10);
 var hash = bcrypt.hashSync("B4c0//", salt);
@@ -42,10 +42,10 @@ const getUsersbyPagination = async (page, limit) => {
   try {
     const { count, rows } = await db.User.findAndCountAll({
       offset: +offset,
-        limit: +limit,
-        attributes: ["id", "username", "email", "phone", "sex","address"],
-      include: { model: db.Group, attributes: ["name", "description","id"] },
-        order:[['id','DESC']]
+      limit: +limit,
+      attributes: ["id", "username", "gender", "home", "birthday", "fullname"],
+      include: { model: db.Group, attributes: ["name", "description", "id"] },
+      order: [["id", "ASC"]],
     });
     let totalPages = Math.ceil(count / limit);
     let data = {
@@ -72,32 +72,24 @@ const getUsersbyPagination = async (page, limit) => {
 };
 const createUsers = async (data) => {
   try {
-    let isEmailExist = await checkEmail(data.email);
-    if (isEmailExist) {
+    let isnameExist = await checkUsername(data.username);
+    if (isnameExist) {
       return {
         EM: "the Email already exists",
         EC: "1",
-        DT: 'email'
+        DT: "email",
       };
     }
-    let isPhoneExist = await checkPhone(data.phone);
-    if (isPhoneExist) {
-      return {
-        EM: "the phone number already exists",
-        EC: "1",
-        DT:'phone'
-      };
-    }
+   
 
     let hashPass = hashPassword(data.password);
-      await db.User.create({...data,password: hashPass})
-  
-      return {
-        EM: "create ok",
-        EC: "0",
-        DT: [],
-      };
-    
+    await db.User.create({ ...data, password: hashPass });
+
+    return {
+      EM: "create ok",
+      EC: "0",
+      DT: [],
+    };
   } catch (error) {
     console.log("---- Error: " + error);
     return {
@@ -109,28 +101,29 @@ const createUsers = async (data) => {
 };
 const updateUsers = async (data) => {
   try {
-    if (!data.groupId) {
+    if (data.groupId == undefined || data.groupId == null) {
       return {
         EM: "Error with empty group",
         EC: "1",
-        DT: 'groupId',
+        DT: "groupId",
       };
     }
     let user = await db.User.findOne({
-      where:{id:data.id}
-    })
-    
+      where: { id: data.id },
+    });
+
     if (user) {
       await user.update({
-        username: data.username,
-        address: data.address,
-        sex: data.sex,
-        groupId: data.groupId
-      })
+        birthday: data.birthday,
+        fullname: data.fullname,
+        gender: data.gender,
+        home: data.home,
+        groupId: data.groupId,
+      });
       return {
         EM: "Update data sussess",
         EC: "0",
-        DT: '',
+        DT: "",
       };
     } else {
       return {
@@ -149,25 +142,24 @@ const updateUsers = async (data) => {
   }
 };
 const deleteUsers = async (id) => {
-    try {
-        const user = await db.User.findOne({
-            where:{id:id}
-        })
-        if (user) {
-            await user.destroy();
-            return {
-                EM: "delete user sussess",
-                EC: "0",
-                DT: [],
-              };
-        } else {
-            return {
-                EM: "user not found",
-                EC: "2",
-                DT: [],
-              };
-        }
- 
+  try {
+    const user = await db.User.findOne({
+      where: { id: id },
+    });
+    if (user) {
+      await user.destroy();
+      return {
+        EM: "delete user sussess",
+        EC: "0",
+        DT: [],
+      };
+    } else {
+      return {
+        EM: "user not found",
+        EC: "2",
+        DT: [],
+      };
+    }
   } catch (error) {
     console.log("---- Error: " + error);
     return {
@@ -177,11 +169,139 @@ const deleteUsers = async (id) => {
     };
   }
 };
+const changePass = async (data, name) => {
+  try {
+    if (!name) {
+      return {
+        EM: "Error with empty group",
+        EC: "1",
+        DT: "groupId",
+      };
+    }
+    let user = await db.User.findOne({
+      where: { username: name },
+    });
 
+    if (user) {
+      let isCorrectPassword = await checkPassword(data.oldpassword, user.password);
+      console.log(user.password,data.password,isCorrectPassword)
+      if (isCorrectPassword) {
+       
+        let hashPass = hashPassword(data.password);
+        
+        await user.update({
+          password: hashPass,
+        });
+      } else {
+        return {
+          EM: "Update data error",
+          EC: "1",
+          DT: "Password incorrect",
+        };
+      }
+      return {
+        EM: "Update data sussess",
+        EC: "0",
+        DT: "",
+      };
+    } else {
+      return {
+        EM: "Error data update",
+        EC: "0",
+        DT: [],
+      };
+    }
+  } catch (error) {
+    console.log("---- Error: " + error);
+    return {
+      EM: "something wrongs with services",
+      EC: "1",
+      DT: [],
+    };
+  }
+};
+const getProfile = async (name) => {
+  try {
+    let user = await db.User.findOne({
+      where: { username: name },
+      attributes: ["id", "username", "fullname", "home", "gender", "avt", "birthday"],
+
+    });
+    if (user) {
+      return {
+        EM: "get data sussess",
+        EC: "0",
+        DT: user,
+      };
+    } else {
+      return {
+        EM: "get data sussess",
+        EC: "0",
+        DT: [],
+      };
+    }
+  } catch (error) {
+    console.log("---- Error: " + error);
+    return {
+      EM: "something wrongs with services",
+      EC: "1",
+      DT: [],
+    };
+  }
+};
+const editProfile = async (data, name) => {
+  try {
+    
+    let user = await db.User.findOne({
+      where: { username: name },
+    });
+
+    if (user) {
+      console.log(data.avt)
+        let haha = await user.update({
+          fullname: data.fullname,
+          home: data.home,
+          gender: data.gender,
+          birthday: data.birthday,
+          avt:data.avt
+        });
+      if (haha) {
+        return {
+          EM: "Update data sussess",
+          EC: "0",
+          DT: haha,
+        };
+      }
+        return {
+          EM: "Update data error",
+          EC: "1",
+          DT: "Password incorrect",
+        };
+      } else {
+        return {
+          EM: "Update data error",
+          EC: "1",
+          DT: "Password incorrect",
+        };
+      }
+     
+    
+  } catch (error) {
+    console.log("---- Error: " + error);
+    return {
+      EM: "something wrongs with services",
+      EC: "1",
+      DT: [],
+    };
+  }
+};
 module.exports = {
   getAllUsers,
   getUsersbyPagination,
   createUsers,
   updateUsers,
   deleteUsers,
+  changePass,
+  getProfile,
+  editProfile
 };

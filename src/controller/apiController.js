@@ -3,8 +3,6 @@ import loginRegister from "../service/login-register";
 const handleRegister = async (req, res) => {
   try {
     if (
-      !req.body.email ||
-      !req.body.phone ||
       !req.body.username ||
       !req.body.password
     ) {

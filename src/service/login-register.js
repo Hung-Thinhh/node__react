@@ -21,9 +21,9 @@ const checkEmail = async (email) => {
   }
   return false;
 };
-const checkPhone = async (phone) => {
+const checkUsername = async (name) => {
   let user = await db.User.findOne({
-    where: { phone: phone },
+    where: { username: name },
   });
   if (user) {
     return true;
@@ -32,28 +32,24 @@ const checkPhone = async (phone) => {
 };
 const handleRegister = async (data) => {
   try {
-    let isEmailExist = await checkEmail(data.email);
-    if (isEmailExist) {
+    
+    let checkname = await checkUsername(data.username);
+    if (checkname) {
       return {
-        EM: "the Email already exists",
-        EC: "1",
-      };
-    }
-    let isPhoneExist = await checkPhone(data.phone);
-    if (isPhoneExist) {
-      return {
-        EM: "the phone number already exists",
+        EM: "the user name already exists",
         EC: "1",
       };
     }
 
     let hashPass = hashPassword(data.password);
     await db.User.create({
-      email: data.email,
-      phone: data.phone,
       username: data.username,
       password: hashPass,
-      groupId: "4",
+      fullname: data.fullname,
+      gender: data.gender,
+      birthday: data.birthday,
+      home: data.home,
+      groupId: "1",
     });
     return {
       EM: "A user created successfully",
@@ -73,9 +69,7 @@ const checkPassword = (inputPassword, hashPassword) => {
 const handleLogin = async (data) => {
   try {
     let user = await db.User.findOne({
-      where: {
-        [Op.or]: [{ email: data.valueLogin }, { phone: data.valueLogin }],
-      },
+      where: { username: data.valueLogin },
     });
     if (user) {
       console.log("hahah");
@@ -128,5 +122,6 @@ module.exports = {
   handleRegister,
   handleLogin,
   checkEmail,
-  checkPhone,
+  checkUsername,
+  checkPassword
 };

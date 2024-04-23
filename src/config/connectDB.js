@@ -2,7 +2,8 @@ const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize('node_react', 'root', null , {
   host: 'localhost',
-  dialect:  'mysql' 
+  dialect: 'mysql',
+  logging: false
 });
 
 const connection = async() => {
