@@ -12,8 +12,15 @@ const hashPassword = (password) => {
 const getAllUsers = async () => {
   try {
     let user = await db.User.findAll({
-      attributes: ["id", "username", "email", "phone", "sex"],
-      include: { model: db.Group, attributes: ["name", "description"] },
+      attributes: ["id", "username", "email", "phone", "sex", "active"],
+      include: [{ 
+        model: db.Group,
+        attributes: ["name", "description"]
+      },
+      {
+        model: db.Danhgia, // thay db.danhgia bằng tên mô hình của bạn
+        attributes: ["finaldanhgia", "danhgia"]
+      }],
     });
     if (user) {
       return {
@@ -43,8 +50,16 @@ const getUsersbyPagination = async (page, limit) => {
     const { count, rows } = await db.User.findAndCountAll({
       offset: +offset,
       limit: +limit,
-      attributes: ["id", "username", "gender", "home", "birthday", "fullname"],
-      include: { model: db.Group, attributes: ["name", "description", "id"] },
+      distinct: true,
+      attributes: ["id", "username", "gender", "home", "birthday", "fullname","active"],
+      include: [{ 
+        model: db.Group,
+        attributes: ["name", "description","id"]
+      },
+      {
+        model: db.Danhgia, // thay db.danhgia bằng tên mô hình của bạn
+        attributes: ["finaldanhgia", "danhgia"]
+      }],
       order: [["id", "ASC"]],
     });
     let totalPages = Math.ceil(count / limit);
@@ -59,15 +74,14 @@ const getUsersbyPagination = async (page, limit) => {
         EC: "0",
         DT: data,
       };
-    } else {
-      return {
-        EM: "get data sussess",
-        EC: "0",
-        DT: [],
-      };
-    }
+    } 
   } catch (error) {
     console.log("---- Error: " + error);
+    return {
+      EM: "get data error",
+      EC: "1",
+      DT: [],
+    };
   }
 };
 const createUsers = async (data) => {
@@ -75,9 +89,9 @@ const createUsers = async (data) => {
     let isnameExist = await checkUsername(data.username);
     if (isnameExist) {
       return {
-        EM: "the Email already exists",
+        EM: "the Username already exists",
         EC: "1",
-        DT: "email",
+        DT: "Username",
       };
     }
    
@@ -86,7 +100,7 @@ const createUsers = async (data) => {
     await db.User.create({ ...data, password: hashPass });
 
     return {
-      EM: "create ok",
+      EM: "Create user successfully",
       EC: "0",
       DT: [],
     };
@@ -113,21 +127,23 @@ const updateUsers = async (data) => {
     });
 
     if (user) {
+      console.log(data)
       await user.update({
         birthday: data.birthday,
         fullname: data.fullname,
         gender: data.gender,
         home: data.home,
         groupId: data.groupId,
+        active: Number(data.active)
       });
       return {
-        EM: "Update data sussess",
+        EM: "Update user sussess",
         EC: "0",
         DT: "",
       };
     } else {
       return {
-        EM: "Error data update",
+        EM: "Error user update",
         EC: "0",
         DT: [],
       };
@@ -257,7 +273,7 @@ const editProfile = async (data, name) => {
     });
 
     if (user) {
-      console.log(data.avt)
+      console.log('haha'+JSON.stringify(data))
         let haha = await user.update({
           fullname: data.fullname,
           home: data.home,

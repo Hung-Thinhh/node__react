@@ -2,23 +2,26 @@ import loginRegister from "../service/login-register";
 
 const handleRegister = async (req, res) => {
   try {
+    const currentDate = new Date();
     if (
       !req.body.username ||
-      !req.body.password
+      !req.body.password || currentDate <= new Date(req.body.birthday)
     ) {
       return res.status(200).json({
-        EM: "missing required",
+        EM: "Thông tin chưa phù hợp",
         EC: "1",
         DT: "",
       });
+    } else {
+      
+      let data = await loginRegister.handleRegister(req.body);
+  console.log(currentDate >= new Date(req.body.birthday))
+      return res.status(200).json({
+        EM: data.EM,
+        EC: data.EC,
+        DT: "",
+      });
     }
-    let data = await loginRegister.handleRegister(req.body);
-
-    return res.status(200).json({
-      EM: data.EM,
-      EC: data.EC,
-      DT: "",
-    });
   } catch (error) {
     return res.status(500).json({
       EM: "error from server",

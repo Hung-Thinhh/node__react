@@ -89,14 +89,15 @@ const deleteFunc = async (req, res) => {
   }
 };
 const accountUser = (req, res) => {
+  console.log('ighjyhghugyuig',req.user)
   return res.status(200).json({
     EM: "ok!",
     EC: "0",
     DT: {
       access_token: req.token,
-      groupWithRole: req.user.groupWithRole,
       email: req.user.email,
       username: req.user.name,
+      active: req.user.active,
     },
   });
 };

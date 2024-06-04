@@ -75,12 +75,12 @@ const handleLogin = async (data) => {
       console.log("hahah");
       let isCorrectPassword = await checkPassword(data.password, user.password);
       if (isCorrectPassword) {
-        let groupWithRole = await getGroupWithRole(user);
         let payload = {
-          email: user.email,
-          groupWithRole,
-          email: user.email,
-          name: user.username
+          name: user.username,
+          id: user.id,
+          role:user.groupId,
+          active:user.active,
+          thongbao:user.thongbao,
         };
         let token = createToken(payload);
         return {
@@ -88,7 +88,6 @@ const handleLogin = async (data) => {
           EC: "0",
           DT: {
             access_token: token,
-            data: groupWithRole,
             email: user.email,
             name: user.username
           },
